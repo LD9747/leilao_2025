@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leilão Zanaflex - Equipamentos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #B2BEBF 0%, #3B3936 100%);
+            min-height: 100vh;
+            color: #3B3936;
+        }
+
+        .header {
+            background: linear-gradient(90deg, #F2CB05, #F29F05);
+            padding: 20px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .logo h1 {
+            color: #3B3936;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .user-info-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .admin-controls {
+            display: none;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #F29F05;
+            color: #3B3936;
+        }
+
+        .btn-primary:hover {
+            background: #F2CB05;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #3B3936;
+            color: #F2CB05;
+        }
+
+        .btn-secondary:hover {
+            background: #B2BEBF;
+            transform: translateY(-2px);
+        }
+        
+        .btn-info {
+            background: #5dade2;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #3498db;
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            padding: 40px 0;
+        }
+
+        .equipment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .equipment-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .equipment-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .equipment-image {
+            width: 100%;
+            height: 200px;
+            background: #B2BEBF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #3B3936;
+            font-size: 1.2rem;
+            position: relative;
+            overflow: hidden;
+            flex-direction: column;
+            gap: 5px;
+            padding: 5px;
+        }
+        .equipment-image-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 5px;
+            width: 100%;
+            height: 100%;
+        }
+
+        .equipment-image-container img {
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .equipment-info {
+            padding: 20px;
+        }
+
+        .equipment-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #3B3936;
+            margin-bottom: 10px;
+        }
+
+        .equipment-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .auction-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .current-bid {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #F29F05;
+        }
+
+        .bid-count {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .bid-section {
+            border-top: 2px solid #F2CB05;
+            padding-top: 15px;
+        }
+
+        .bid-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .bid-input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #B2BEBF;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .bid-input:focus {
+            outline: none;
+            border-color: #F29F05;
+        }
+
+        .bid-btn {
+            background: #F2CB05;
+            color: #3B3936;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .bid-btn:hover {
+            background: #F29F05;
+        }
+
+        .bid-btn:disabled {
+            background: #B2BEBF;
+            cursor: not-allowed;
+        }
+
+        .timer {
+            background: #3B3936;
+            color: #F2CB05;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #F29F05;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #3B3936;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #B2BEBF;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #F29F05;
+        }
+        
+        .form-message {
+            margin-top: 10px;
+            font-size: 0.9em;
+            text-align: center;
+        }
+
+        .form-message.error {
+            color: #ff4444;
+        }
+        
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .image-preview img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .recent-bids {
+            max-height: 120px;
+            overflow-y: auto;
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .bid-entry {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .bid-entry:last-child {
+            border-bottom: none;
+        }
+
+        .bid-user {
+            font-weight: bold;
+            color: #3B3936;
+        }
+
+        .bid-amount {
+            color: #F29F05;
+            font-weight: bold;
+        }
+
+        .auction-ended {
+            background: #ff4444;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .winner-announcement {
+            background: #44ff44;
+            color: #3B3936;
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: #ddd;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .tab-btn.active {
+            background: #F2CB05;
+        }
+
+        .tab-btn:first-child {
+            border-radius: 10px 0 0 10px;
+        }
+
+        .tab-btn:last-child {
+            border-radius: 0 10px 10px 0;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+        
+        #userWelcome {
+            font-weight: bold;
+            color: #3B3936;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .equipment-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .logo h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>ZANAFLEX</h1>
+                    <p>Leilão de Equipamentos</p>
+                </div>
+                <div class="user-info-controls">
+                    <span id="userWelcome"></span>
+                    <button id="authBtn" class="btn btn-info" onclick="openAuthModal()">Entrar / Cadastrar</button>
+                    <div id="adminControls" class="admin-controls">
+                        <button class="btn btn-primary" onclick="openEquipmentModal()">+ Adicionar Equipamento</button>
+                        <button id="toggleAuctionBtn" class="btn btn-secondary" onclick="toggleAuction()">Iniciar Leilão</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="main-content">
+            <div id="equipmentGrid" class="equipment-grid">
+                </div>
+        </div>
+    </div>
+
+    <div id="equipmentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEquipmentModal()">&times;</span>
+            <h2>Adicionar Novo Equipamento</h2>
+            <form id="equipmentForm">
+                <div class="form-group">
+                    <label for="equipmentName">Nome do Equipamento:</label>
+                    <input type="text" id="equipmentName" required>
+                </div>
+                <div class="form-group">
+                    <label for="equipmentDescription">Descrição:</label>
+                    <textarea id="equipmentDescription" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="equipmentImages">Adicionar Fotos:</label>
+                    <input type="file" id="equipmentImages" multiple accept="image/*">
+                    <div id="imagePreview" class="image-preview"></div>
+                </div>
+                <div class="form-group">
+                    <label for="startingBid">Lance Inicial (R$):</label>
+                    <input type="number" id="startingBid" min="0" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="auctionDuration">Duração do Leilão (minutos):</label>
+                    <input type="number" id="auctionDuration" min="1" value="30" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Adicionar Equipamento</button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAuthModal()">&times;</span>
+            <div class="tab-buttons">
+                <button id="tabRegister" class="tab-btn active" onclick="showTab('register')">Cadastrar</button>
+                <button id="tabLogin" class="tab-btn" onclick="showTab('login')">Entrar</button>
+            </div>
+            <div id="registerTab" class="tab-content active">
+                <h2>Cadastro</h2>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="registerName">Nome:</label>
+                        <input type="text" id="registerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">E-mail:</label>
+                        <input type="email" id="registerEmail" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Cadastrar e Entrar</button>
+                </form>
+            </div>
+            <div id="loginTab" class="tab-content">
+                <h2>Entrar</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail">E-mail:</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Senha:</label>
+                        <input type="password" id="loginPassword">
+                        <span style="font-size: 0.8em; color: #666;">Apenas para administradores.</span>
+                    </div>
+                    <p id="loginMessage" class="form-message error"></p>
+                    <button type="submit" class="btn btn-primary">Entrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let equipments = [];
+        let auctionActive = false;
+        let equipmentCounter = 0;
+        let loggedInUser = null;
+        
+        const ADMIN_USER = {
+            email: 'lucas.lisboa@zanaflex.com.br',
+            password: 'znfx@3994',
+            name: 'Lucas Lisboa',
+            role: 'admin'
+        };
+
+        function initializeAuction() {
+            // Verifica se há dados de leilão salvos no localStorage
+            const savedEquipments = localStorage.getItem('leilaoEquipments');
+            if (savedEquipments) {
+                equipments = JSON.parse(savedEquipments);
+                // Renumera os IDs para evitar conflitos ao adicionar novos itens
+                if (equipments.length > 0) {
+                    equipmentCounter = Math.max(...equipments.map(e => e.id));
+                }
+            } else {
+                 // Equipamentos de exemplo caso não haja dados salvos
+                equipments = [
+                    {
+                        id: ++equipmentCounter,
+                        name: "Impressora Multifuncional HP",
+                        description: "Impressora, scanner e copiadora em ótimo estado de conservação",
+                        images: [],
+                        currentBid: 150.00,
+                        startingBid: 100.00,
+                        bids: [{user: "João Silva", amount: 150.00, time: new Date()}],
+                        duration: 30,
+                        timeLeft: 1800,
+                        active: false
+                    },
+                    {
+                        id: ++equipmentCounter,
+                        name: "Monitor Dell 24\"",
+                        description: "Monitor LED Full HD, entrada HDMI e VGA",
+                        images: [],
+                        currentBid: 200.00,
+                        startingBid: 200.00,
+                        bids: [],
+                        duration: 30,
+                        timeLeft: 1800,
+                        active: false
+                    }
+                ];
+            }
+            loadUserFromLocalStorage();
+            renderEquipments();
+        }
+
+        // Função para salvar o estado do leilão no localStorage
+        function saveAuctionState() {
+            localStorage.setItem('leilaoEquipments', JSON.stringify(equipments));
+        }
+
+        // --- Funções de Autenticação ---
+        function openAuthModal() {
+            document.getElementById('authModal').style.display = 'block';
+            showTab('login');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').style.display = 'none';
+        }
+
+        function showTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-content');
+            const buttons = document.querySelectorAll('.tab-btn');
+
+            tabs.forEach(tab => tab.classList.remove('active'));
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(`${tabName}Tab`).classList.add('active');
+            document.getElementById(`tab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`).classList.add('active');
+        }
+
+        function registerUser(event) {
+            event.preventDefault();
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            
+            if (email === ADMIN_USER.email) {
+                alert('Este e-mail é reservado para o administrador.');
+                return;
+            }
+
+            let users = JSON.parse(localStorage.getItem('leilaoUsers')) || [];
+            
+            if (users.some(user => user.email === email)) {
+                alert('Este e-mail já está cadastrado.');
+                return;
+            }
+
+            const newUser = { name, email, role: 'user' };
+            users.push(newUser);
+            localStorage.setItem('leilaoUsers', JSON.stringify(users));
+
+            loggedInUser = newUser;
+            saveUserToLocalStorage();
+            updateAuthUI();
+            closeAuthModal();
+        }
+
+        function loginUser(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const messageEl = document.getElementById('loginMessage');
+            
+            messageEl.textContent = ''; // Limpa mensagens de erro anteriores
+
+            // Tenta logar como administrador
+            if (email === ADMIN_USER.email && password === ADMIN_USER.password) {
+                loggedInUser = ADMIN_USER;
+                saveUserToLocalStorage();
+                updateAuthUI();
+                closeAuthModal();
+                return;
+            } else if (email === ADMIN_USER.email && password !== ADMIN_USER.password) {
+                messageEl.textContent = 'Senha incorreta para o administrador.';
+                return;
+            }
+
+            // Tenta logar como usuário comum
+            let users = JSON.parse(localStorage.getItem('leilaoUsers')) || [];
+            const user = users.find(u => u.email === email);
+            
+            if (!user) {
+                messageEl.textContent = 'E-mail não encontrado. Por favor, cadastre-se.';
+                return;
+            }
+
+            loggedInUser = user;
+            saveUserToLocalStorage();
+            updateAuthUI();
+            closeAuthModal();
+        }
+
+        function logoutUser() {
+            loggedInUser = null;
+            localStorage.removeItem('loggedInUser');
+            updateAuthUI();
+            renderEquipments();
+        }
+        
+        function saveUserToLocalStorage() {
+            localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+        }
+        
+        function loadUserFromLocalStorage() {
+            const user = localStorage.getItem('loggedInUser');
+            if (user) {
+                loggedInUser = JSON.parse(user);
+            }
+            updateAuthUI();
+        }
+
+        function updateAuthUI() {
+            const authBtn = document.getElementById('authBtn');
+            const userWelcome = document.getElementById('userWelcome');
+            const adminControls = document.getElementById('adminControls');
+
+            if (loggedInUser) {
+                authBtn.textContent = 'Sair';
+                authBtn.onclick = logoutUser;
+                userWelcome.textContent = `Olá, ${loggedInUser.name}!`;
+                userWelcome.style.display = 'inline';
+                
+                if (loggedInUser.role === 'admin') {
+                    adminControls.style.display = 'flex';
+                } else {
+                    adminControls.style.display = 'none';
+                }
+            } else {
+                authBtn.textContent = 'Entrar / Cadastrar';
+                authBtn.onclick = openAuthModal;
+                userWelcome.style.display = 'none';
+                adminControls.style.display = 'none';
+            }
+        }
+        
+        // --- Funções de Leilão (existentes) ---
+        function openEquipmentModal() {
+            document.getElementById('equipmentModal').style.display = 'block';
+        }
+
+        function closeEquipmentModal() {
+            document.getElementById('equipmentModal').style.display = 'none';
+            document.getElementById('equipmentForm').reset();
+            document.getElementById('imagePreview').innerHTML = ''; // Limpa as pré-visualizações
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(value);
+        }
+
+        function formatTime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            
+            if (hours > 0) {
+                return `${hours}h ${minutes}m ${secs}s`;
+            }
+            return `${minutes}m ${secs}s`;
+        }
+
+        function renderEquipments() {
+            const grid = document.getElementById('equipmentGrid');
+            grid.innerHTML = '';
+
+            equipments.forEach(equipment => {
+                const card = document.createElement('div');
+                card.className = 'equipment-card';
+                
+                const imagesHtml = equipment.images.length > 0 
+                    ? `<div class="equipment-image-container">${equipment.images.map(img => `<img src="${img}" alt="Imagem do produto">`).join('')}</div>`
+                    : `<div style="text-align: center;">📷<br>Nenhuma imagem disponível</div>`;
+
+                const bidsHtml = equipment.bids.length > 0 
+                    ? equipment.bids.slice(-5).reverse().map(bid => `
+                        <div class="bid-entry">
+                            <span class="bid-user">${bid.user}</span>
+                            <span class="bid-amount">${formatCurrency(bid.amount)}</span>
+                        </div>
+                    `).join('')
+                    : '<div style="text-align: center; color: #666;">Nenhum lance ainda</div>';
+
+                const isAuctionEnded = equipment.timeLeft <= 0;
+                const bidButtonDisabled = !loggedInUser || isAuctionEnded;
+                
+                const actionSection = equipment.active 
+                    ? (isAuctionEnded
+                        ? `<div class="auction-ended">Leilão Encerrado</div>
+                           ${equipment.bids.length > 0 ? `<div class="winner-announcement">🏆 Vencedor: ${equipment.bids[equipment.bids.length - 1].user}</div>` : ''}`
+                        : `<div class="bid-input-group">
+                             <input type="number" class="bid-input" placeholder="Seu lance" min="${equipment.currentBid + 1}" step="1" id="bidInput${equipment.id}">
+                             <button class="bid-btn" onclick="placeBid(${equipment.id})" ${bidButtonDisabled ? 'disabled' : ''}>Lance!</button>
+                           </div>
+                           ${!loggedInUser ? `<div style="color: #ff4444; font-size: 0.9rem; margin-top: 5px;">Faça login para dar um lance.</div>` : ''}`)
+                    : `<div style="text-align: center; color: #666; padding: 15px;">Aguardando início do leilão</div>`;
+
+                card.innerHTML = `
+                    <div class="equipment-image">
+                        ${imagesHtml}
+                    </div>
+                    <div class="equipment-info">
+                        <div class="equipment-title">${equipment.name}</div>
+                        <div class="equipment-description">${equipment.description}</div>
+                        <div class="auction-status">
+                            <div class="current-bid">${formatCurrency(equipment.currentBid)}</div>
+                            <div class="timer">${equipment.active ? formatTime(equipment.timeLeft) : 'Inativo'}</div>
+                        </div>
+                        <div class="bid-count">${equipment.bids.length} lance(s)</div>
+                        <div class="bid-section">
+                            ${actionSection}
+                            <div class="recent-bids">
+                                <strong>Lances recentes:</strong>
+                                ${bidsHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        function placeBid(equipmentId) {
+            if (!loggedInUser) {
+                alert('Você precisa estar logado para dar um lance!');
+                openAuthModal();
+                return;
+            }
+
+            const equipment = equipments.find(e => e.id === equipmentId);
+            const bidInput = document.getElementById(`bidInput${equipmentId}`);
+            const bidAmount = parseFloat(bidInput.value);
+
+            if (!bidAmount || bidAmount <= equipment.currentBid) {
+                alert('O lance deve ser maior que o valor atual!');
+                return;
+            }
+
+            equipment.currentBid = bidAmount;
+            equipment.bids.push({
+                user: loggedInUser.name,
+                amount: bidAmount,
+                time: new Date()
+            });
+
+            bidInput.value = '';
+            renderEquipments();
+            saveAuctionState();
+
+            if (equipment.timeLeft < 30) {
+                equipment.timeLeft += 30;
+            }
+        }
+
+        function toggleAuction() {
+            if (loggedInUser.role !== 'admin') {
+                alert('Apenas o administrador pode iniciar/parar o leilão.');
+                return;
+            }
+            auctionActive = !auctionActive;
+            
+            equipments.forEach(equipment => {
+                equipment.active = auctionActive;
+                if (auctionActive) {
+                    equipment.timeLeft = equipment.duration * 60;
+                }
+            });
+
+            const button = document.getElementById('toggleAuctionBtn');
+            button.textContent = auctionActive ? 'Parar Leilão' : 'Iniciar Leilão';
+            button.className = auctionActive ? 'btn btn-secondary' : 'btn btn-primary';
+
+            if (auctionActive) {
+                startTimer();
+            }
+
+            renderEquipments();
+            saveAuctionState();
+        }
+
+        function startTimer() {
+            const timer = setInterval(() => {
+                let activeAuctions = 0;
+                
+                equipments.forEach(equipment => {
+                    if (equipment.active && equipment.timeLeft > 0) {
+                        equipment.timeLeft--;
+                        activeAuctions++;
+                    }
+                });
+
+                renderEquipments();
+
+                if (activeAuctions === 0) {
+                    clearInterval(timer);
+                    auctionActive = false;
+                    const button = document.getElementById('toggleAuctionBtn');
+                    if (button) {
+                        button.textContent = 'Iniciar Leilão';
+                        button.className = 'btn btn-primary';
+                    }
+                }
+            }, 1000);
+        }
+
+        // Pré-visualização das imagens no modal de adicionar equipamento
+        document.getElementById('equipmentImages').addEventListener('change', function(e) {
+            const previewContainer = document.getElementById('imagePreview');
+            previewContainer.innerHTML = '';
+            for (const file of e.target.files) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = document.createElement('img');
+                    img.src = event.target.result;
+                    previewContainer.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('equipmentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const imageFiles = document.getElementById('equipmentImages').files;
+            const imagePromises = [];
+
+            for (const file of imageFiles) {
+                imagePromises.push(new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        resolve(event.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                }));
+            }
+
+            Promise.all(imagePromises).then(imagesArray => {
+                const newEquipment = {
+                    id: ++equipmentCounter,
+                    name: document.getElementById('equipmentName').value,
+                    description: document.getElementById('equipmentDescription').value,
+                    images: imagesArray,
+                    currentBid: parseFloat(document.getElementById('startingBid').value),
+                    startingBid: parseFloat(document.getElementById('startingBid').value),
+                    bids: [],
+                    duration: parseInt(document.getElementById('auctionDuration').value),
+                    timeLeft: parseInt(document.getElementById('auctionDuration').value) * 60,
+                    active: auctionActive
+                };
+
+                equipments.push(newEquipment);
+                renderEquipments();
+                saveAuctionState();
+                closeEquipmentModal();
+            });
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', registerUser);
+        document.getElementById('loginForm').addEventListener('submit', loginUser);
+
+        window.onclick = function(event) {
+            const equipmentModal = document.getElementById('equipmentModal');
+            const authModal = document.getElementById('authModal');
+            if (event.target == equipmentModal) {
+                closeEquipmentModal();
+            }
+            if (event.target == authModal) {
+                closeAuthModal();
+            }
+        }
+
+        initializeAuction();
+    </script>
+</body>
+</html>
